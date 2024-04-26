@@ -9,6 +9,7 @@ If a node contains `value` property it means there are no child nodes to evaluat
 Your code should NOT use recursion.
 
 Allowed actions are:
+
 - `+` - the result is sum of right and left child nodes
 - `-` - the result is difference of right and left child nodes (value of left minus value of left)
 - `*` - left and right nodes multiplied
@@ -37,6 +38,7 @@ Allowed actions are:
 ```json
 { "action": "-", "left": { "value": 3 }, "right": { "value": 1 } }
 ```
+
   </td>
   <td>2</td>
 

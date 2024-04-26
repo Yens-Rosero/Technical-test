@@ -51,4 +51,24 @@ Every `action` with handler performs some calculation based on its child actions
 2. In `src/handlers/` create file with `Newest` handler, which will return item with most recent timestamp. There is already one handler created in `src/handlers/counter.js` that you can use as a template.
 3. In `src/calculate.js` create function that will fetch all necessary actions (the one requested by user and all child actions) and perform calculations in correct order. You can assume that all the outputs from child actions are valid inputs for parent action. The function can use recursion to handle child calculations.
 4. Make all tests in `tests/` passing. You can also create additional test cases.
-If you feel it's necessary you can add additional files or modify existing code.
+   If you feel it's necessary you can add additional files or modify existing code.
+
+## Setting up
+
+Before you can execute the tests, you need to start a local DynamoDB instance on your local. See more on local DynamoDB [here](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html). You'd also have to have Java installed.
+
+On a separate terminal, run
+
+```bash
+npm run start:dynamo
+```
+
+to start the local DynamoDB
+
+and then
+
+```bash
+npm test
+```
+
+to execute your test cases

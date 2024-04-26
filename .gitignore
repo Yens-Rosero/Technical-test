@@ -1,2 +1,5 @@
 node_modules/
 coverage/
+*.db
+dynamodb-local-metadata.json
+.DS_Store

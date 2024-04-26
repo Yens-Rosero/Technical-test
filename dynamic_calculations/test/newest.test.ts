@@ -1,41 +1,31 @@
 import handler from "../index";
-import { DynamoDB } from "aws-sdk";
 import { beforeAll, test, expect } from "@jest/globals";
-
-const dbClient = new DynamoDB.DocumentClient({
-  apiVersion: "2012-08-10",
-  region: "eu-west-1",
-  ...(process.env.MOCK_DYNAMODB_ENDPOINT && {
-    endpoint: process.env.MOCK_DYNAMODB_ENDPOINT,
-    sslEnabled: false,
-    region: "local",
-  }),
-});
+import { dbClient, TableNames, UserRoles } from "./../src/common/db";
 
 beforeAll(async () => {
   await dbClient
-  .put({
-    TableName: "actions",
-    Item: {
-      pk: "1",
-      role: "basicuser",
-      handler: "NEWEST"
-    },
-  })
-  .promise();
+    .put({
+      TableName: "actions",
+      Item: {
+        pk: "1",
+        role: UserRoles.basicuser,
+        handler: "NEWEST",
+      },
+    })
+    .promise();
   await dbClient
     .put({
-      TableName: "users",
+      TableName: TableNames.users,
       Item: {
         pk: "123",
-        role: "sysadmin",
+        role: UserRoles.sysadmin,
       },
     })
     .promise();
 
   await dbClient
     .put({
-      TableName: "actions",
+      TableName: TableNames.actions,
       Item: {
         pk: "2",
         parentActionId: "1",
@@ -46,7 +36,7 @@ beforeAll(async () => {
 
   await dbClient
     .put({
-      TableName: "actions",
+      TableName: TableNames.actions,
       Item: {
         pk: "3",
         parentActionId: "1",
@@ -57,7 +47,7 @@ beforeAll(async () => {
 });
 
 test("Some items to count", async () => {
-  await dbClient
+  await dbClient;
 
   const { body } = await handler({
     Headers: { userid: "123" },

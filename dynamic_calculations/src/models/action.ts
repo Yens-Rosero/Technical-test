@@ -20,7 +20,7 @@ export class Action {
   }
 
   static async getById(id) {
-    const res = (await dbClient.get({ TableName: TableNames.AuthRule, Key: { pk: id } }).promise())
+    const res = (await dbClient.get({ TableName: TableNames.authRules, Key: { pk: id } }).promise())
       .Item;
 
     if (!res.Item) {
@@ -32,7 +32,9 @@ export class Action {
 
   async getParentAction() {
     const res = (
-      await dbClient.get({ TableName: TableNames.Action, Key: { pk: this.parentRuleId } }).promise()
+      await dbClient
+        .get({ TableName: TableNames.actions, Key: { pk: this.parentRuleId } })
+        .promise()
     ).Item;
 
     if (!res.Item) {
@@ -43,15 +45,13 @@ export class Action {
   }
 
   async getChildActions() {
-    const res = (
-      await dbClient
-        .query({
-          TableName: TableNames.Action,
-          IndexName: "parent-index",
-          ExclusiveStartKey: { pk: this.parentActionId },
-        })
-        .promise()
-    );
+    const res = await dbClient
+      .query({
+        TableName: TableNames.actions,
+        IndexName: "parent-index",
+        ExclusiveStartKey: { pk: this.parentActionId },
+      })
+      .promise();
 
     if (!res.Items) {
       throw new Error("Action does not exist");

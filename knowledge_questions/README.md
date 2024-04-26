@@ -24,6 +24,9 @@ class IdGenerator {
 
 const { getId }: { getId: () => number } = new IdGenerator();
 
-const people: Person[] = ["Tom", "Kate"].map((name: string) => ({ name, id: getId() }));
+const people: Person[] = ["Tom", "Kate"].map((name: string) => ({
+  name,
+  id: getId(),
+}));
 console.log(people);
 ```

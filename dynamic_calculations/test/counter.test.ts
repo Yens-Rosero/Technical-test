@@ -1,35 +1,25 @@
 import handler from "../index";
-import { DynamoDB } from "aws-sdk";
 import { beforeAll, test, expect } from "@jest/globals";
-
-const dbClient = new DynamoDB.DocumentClient({
-  apiVersion: "2012-08-10",
-  region: "eu-west-1",
-  ...(process.env.MOCK_DYNAMODB_ENDPOINT && {
-    endpoint: process.env.MOCK_DYNAMODB_ENDPOINT,
-    sslEnabled: false,
-    region: "local",
-  }),
-});
+import { dbClient, TableNames, UserRoles } from "./../src/common/db";
 
 beforeAll(async () => {
   await dbClient
     .put({
-      TableName: "users",
+      TableName: TableNames.users,
       Item: {
         pk: "123",
-        role: "sysadmin",
+        role: UserRoles.sysadmin,
       },
     })
     .promise();
 
   await dbClient
     .put({
-      TableName: "actions",
+      TableName: TableNames.actions,
       Item: {
         pk: "1",
         handler: "COUNTER",
-        ROLE: "basicuser",
+        ROLE: UserRoles.basicuser,
       },
     })
     .promise();

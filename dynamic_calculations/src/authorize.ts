@@ -1,4 +1,4 @@
-function authorize() {
+function authorize(userId: string) {
   return true;
 }
 
