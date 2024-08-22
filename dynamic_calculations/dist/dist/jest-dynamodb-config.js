@@ -22,6 +22,7 @@ const config = {
           ],
           Projection: { ProjectionType: "ALL" },
           ProvisionedThroughput: {
+            // Add provisioned throughput for the index
             ReadCapacityUnits: 1,
             WriteCapacityUnits: 1,
           },
@@ -40,5 +41,4 @@ const config = {
   ],
   port: 9100,
 };
-
 module.exports = config;

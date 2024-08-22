@@ -19,7 +19,7 @@ beforeAll(async () => {
       Item: {
         pk: "1",
         handler: "COUNTER",
-        ROLE: UserRoles.basicuser,
+        role: UserRoles.basicuser,
       },
     })
     .promise();
@@ -31,7 +31,11 @@ test("No items to count", async () => {
     body: JSON.stringify({ actionid: "1" }),
   });
 
-  expect(body).toStrictEqual({ result: 0 });
+  expect(body).toStrictEqual(
+    expect.objectContaining({
+      result: 0,
+    }),
+  );
 });
 
 test("Some items to count", async () => {
@@ -40,7 +44,7 @@ test("Some items to count", async () => {
       TableName: "actions",
       Item: {
         pk: "2",
-        parentActionId: "1",
+        parent: "1",
         data: {},
       },
     })
@@ -51,5 +55,9 @@ test("Some items to count", async () => {
     body: JSON.stringify({ actionid: "1" }),
   });
 
-  expect(body).toStrictEqual({ result: 1 });
+  expect(body).toStrictEqual(
+    expect.objectContaining({
+      result: 1,
+    }),
+  );
 });

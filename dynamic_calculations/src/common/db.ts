@@ -1,12 +1,13 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 
 const isTest = process.env.JEST_WORKER_ID;
+
 const config = {
   convertEmptyValues: true,
   ...(isTest && {
-    endpoint: "localhost:9100",
+    endpoint: "http://localhost:9100",
     sslEnabled: false,
-    region: "local-env",
+    region: "us-west-2",
     credentials: {
       accessKeyId: "fakeMyKeyId",
       secretAccessKey: "fakeSecretAccessKey",

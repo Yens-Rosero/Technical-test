@@ -1,25 +1,30 @@
-const { dbClient, TableNames } = require("../common/db");
-const Role = require("./role");
+import { dbClient, TableNames } from "../common/db";
 
-class User {
-  id;
-  role;
+interface UserInput {
+  id: string;
+  role: symbol;
+}
 
-  constructor(input) {
+export class User {
+  id: string;
+  role: symbol;
+
+  constructor(input: UserInput) {
     this.id = input.id;
-    this.role = Role.from(input.role);
+    this.role = input.role;
   }
 
-  static async getById(id) {
-    const res = (await dbClient.get({ TableName: TableNames.users, Key: { pk: id } }).promise())
-      .Item;
+  static async getById(id: string): Promise<User> {
+    const res = await dbClient.get({ TableName: TableNames.users, Key: { pk: id } }).promise();
+    const item = res.Item;
 
-    if (!res.Item) {
+    if (!item) {
       throw new Error("User does not exist");
     }
 
-    return new User(res.Item);
+    return new User({
+      id: item.pk as string,
+      role: item.role,
+    });
   }
 }
-
-module.exports = User;

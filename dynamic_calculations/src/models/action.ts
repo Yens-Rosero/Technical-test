@@ -1,62 +1,63 @@
-import Role from "./role";
-
 import { dbClient, TableNames } from "../common/db";
-import Handler from "../handlers/index";
 
 export class Action {
-  id;
-  parentActionId;
-  parentRule;
-  parentRuleId;
-  role;
-  handler;
+  id: string;
+  parentActionId: string;
+  parentRule: string;
+  parentRuleId: string;
+  role: string;
+  handler: string;
 
-  constructor(input) {
-    this.id = input.id;
-    this.parentRule = input.parentRule;
-    this.parentRuleId = input.parentRuleId;
-    this.role = Role.from(input.role);
-    this.handler = Handler.from(input.handler);
+  constructor(input: any) {
+    this.id = input.pk;
+    this.parentActionId = input.parent || "";
+    this.parentRule = input.parentRule || "";
+    this.parentRuleId = input.parentRuleId || "";
+    this.role = input.role || "";
+    this.handler = input.handler || "";
   }
 
-  static async getById(id) {
-    const res = (await dbClient.get({ TableName: TableNames.authRules, Key: { pk: id } }).promise())
-      .Item;
+  static async getById(id: string): Promise<Action> {
+    try {
+      const params = {
+        TableName: TableNames.actions,
+        Key: { pk: id },
+      };
 
-    if (!res.Item) {
-      throw new Error("Action does not exist");
+      const res = await dbClient.get(params).promise();
+
+      if (!res || !res.Item) {
+        throw new Error(`Action with ID ${id} does not exist`);
+      }
+
+      return new Action(res.Item);
+    } catch (error) {
+      console.error(`Error fetching action with ID ${id}:`, error);
+      throw error;
     }
-
-    return new Action(res.Item);
   }
 
-  async getParentAction() {
-    const res = (
-      await dbClient
-        .get({ TableName: TableNames.actions, Key: { pk: this.parentRuleId } })
-        .promise()
-    ).Item;
-
-    if (!res.Item) {
-      throw new Error("Rule does not exist");
-    }
-
-    return new Action(res.Item);
-  }
-
-  async getChildActions() {
-    const res = await dbClient
-      .query({
+  async getChildActions(): Promise<Action[]> {
+    try {
+      const params = {
         TableName: TableNames.actions,
         IndexName: "parent-index",
-        ExclusiveStartKey: { pk: this.parentActionId },
-      })
-      .promise();
+        KeyConditionExpression: "parent = :parent",
+        ExpressionAttributeValues: {
+          ":parent": this.id,
+        },
+      };
 
-    if (!res.Items) {
-      throw new Error("Action does not exist");
+      const res = await dbClient.query(params).promise();
+
+      if (!res || !res.Items || res.Items.length === 0) {
+        return [];
+      }
+
+      return res.Items.map((item) => new Action(item));
+    } catch (error) {
+      console.error(`Error fetching child actions for parentActionId ${this.id}:`, error);
+      throw error;
     }
-
-    return res.Items.map((item) => new Action(item));
   }
 }

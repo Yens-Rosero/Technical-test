@@ -1,6 +1,5 @@
 import handler from "../index";
 import { test, expect } from "@jest/globals";
-
 import { dbClient, TableNames, UserRoles } from "./../src/common/db";
 
 test("Disallowed", async () => {
@@ -20,35 +19,29 @@ test("Disallowed", async () => {
       Item: {
         pk: "1",
         handler: "COUNTER",
-        ROLE: UserRoles.basicuser,
+        role: UserRoles.enterprise,
       },
     })
     .promise();
 
-  const { statusCode } = await handler({
+  const response = await handler({
     Headers: { userid: "123" },
     body: JSON.stringify({ actionid: "1" }),
   });
 
-  expect(statusCode).toBe(403);
-
-  // remove test items
+  expect(response.statusCode).toBe(403);
 
   await dbClient
     .delete({
       TableName: TableNames.users,
-      Key: {
-        pk: "123",
-      },
+      Key: { pk: "123" },
     })
     .promise();
 
   await dbClient
     .delete({
       TableName: TableNames.actions,
-      Key: {
-        pk: "1",
-      },
+      Key: { pk: "1" },
     })
     .promise();
 });
@@ -58,8 +51,8 @@ test("Allowed", async () => {
     .put({
       TableName: TableNames.users,
       Item: {
-        pk: "123",
-        role: UserRoles.enterprise,
+        pk: "234",
+        role: UserRoles.sysadmin,
       },
     })
     .promise();
@@ -70,32 +63,28 @@ test("Allowed", async () => {
       Item: {
         pk: "1",
         handler: "COUNTER",
-        ROLE: UserRoles.sysadmin,
+        role: UserRoles.basicuser,
       },
     })
     .promise();
 
-  const { statusCode } = await handler({
+  const response = await handler({
     Headers: { userid: "234" },
     body: JSON.stringify({ actionid: "1" }),
   });
 
-  expect(statusCode).toBe(200);
-
+  expect(response.statusCode).toBe(200);
   await dbClient
     .delete({
       TableName: TableNames.users,
-      Key: {
-        pk: "234",
-      },
+      Key: { pk: "234" },
     })
     .promise();
+
   await dbClient
     .delete({
       TableName: TableNames.actions,
-      Key: {
-        pk: "1",
-      },
+      Key: { pk: "1" },
     })
     .promise();
 });
