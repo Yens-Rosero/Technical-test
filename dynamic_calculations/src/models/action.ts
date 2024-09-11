@@ -1,23 +1,35 @@
+// src/models/action.ts
+
 import { dbClient, TableNames } from "../common/db";
+import Role from "./role";
+
+interface ActionInput {
+  id: string;
+  parentActionId: string;
+  parentRule: string;
+  parentRuleId: string;
+  role: symbol;
+  handler: string;
+}
 
 export class Action {
   id: string;
   parentActionId: string;
   parentRule: string;
   parentRuleId: string;
-  role: string;
+  role: symbol;
   handler: string;
 
-  constructor(input: any) {
-    this.id = input.pk;
-    this.parentActionId = input.parent || "";
+  constructor(input: ActionInput) {
+    this.id = input.id;
+    this.parentActionId = input.parentActionId || "";
     this.parentRule = input.parentRule || "";
     this.parentRuleId = input.parentRuleId || "";
-    this.role = input.role || "";
+    this.role = input.role;
     this.handler = input.handler || "";
   }
 
-  static async getById(id: string): Promise<Action> {
+  static async getById(id: string): Promise<Action | null> {
     try {
       const params = {
         TableName: TableNames.actions,
@@ -25,15 +37,28 @@ export class Action {
       };
 
       const res = await dbClient.get(params).promise();
+      const item = res.Item;
 
-      if (!res || !res.Item) {
-        throw new Error(`Action with ID ${id} does not exist`);
+      if (!item) {
+        return null;
       }
 
-      return new Action(res.Item);
+      const role = Role.from(item.role as string);
+
+      if (!role) {
+        throw new Error("Invalid role from database");
+      }
+
+      return new Action({
+        id: item.pk as string,
+        parentActionId: item.parent || "",
+        parentRule: item.parentRule || "",
+        parentRuleId: item.parentRuleId || "",
+        role: role,
+        handler: item.handler || "",
+      });
     } catch (error) {
-      console.error(`Error fetching action with ID ${id}:`, error);
-      throw error;
+      return null;
     }
   }
 
@@ -50,13 +75,25 @@ export class Action {
 
       const res = await dbClient.query(params).promise();
 
-      if (!res || !res.Items || res.Items.length === 0) {
-        return [];
-      }
+      return (
+        res.Items?.map((item) => {
+          const role = Role.from(item.role as string);
 
-      return res.Items.map((item) => new Action(item));
+          if (!role) {
+            throw new Error("Invalid role from database");
+          }
+
+          return new Action({
+            id: item.pk as string,
+            parentActionId: item.parent || "",
+            parentRule: item.parentRule || "",
+            parentRuleId: item.parentRuleId || "",
+            role: role,
+            handler: item.handler || "",
+          });
+        }) || []
+      );
     } catch (error) {
-      console.error(`Error fetching child actions for parentActionId ${this.id}:`, error);
       throw error;
     }
   }

@@ -15,7 +15,21 @@ export type ResponseType = {
     timestamp?: Date;
     color?: string;
     image?: string;
-    result?: number;
+    result?: object;
     message?: string;
   };
+};
+
+export type CalculateResult = {
+  result?: number;
+  color?: string;
+  image?: string;
+};
+
+export type Source = {
+  result?: number;
+};
+
+export type ActionHandler = {
+  handle(...sources: any[]): any;
 };

@@ -21,7 +21,6 @@ const handler = async function (event: EventPayload): Promise<ResponseType> {
     }
 
     const calculationResult = await calculate(actionId);
-
     return {
       statusCode: 200,
       body: {

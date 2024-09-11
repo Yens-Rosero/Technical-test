@@ -3,3 +3,5 @@ coverage/
 *.db
 dynamodb-local-metadata.json
 .DS_Store
+*.js
+*.js.map

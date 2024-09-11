@@ -33,7 +33,9 @@ test("No items to count", async () => {
 
   expect(body).toStrictEqual(
     expect.objectContaining({
-      result: 0,
+      result: expect.objectContaining({
+        result: 0,
+      }),
     }),
   );
 });
@@ -46,6 +48,7 @@ test("Some items to count", async () => {
         pk: "2",
         parent: "1",
         data: {},
+        role: UserRoles.basicuser,
       },
     })
     .promise();
@@ -57,7 +60,9 @@ test("Some items to count", async () => {
 
   expect(body).toStrictEqual(
     expect.objectContaining({
-      result: 1,
+      result: expect.objectContaining({
+        result: 1,
+      }),
     }),
   );
 });

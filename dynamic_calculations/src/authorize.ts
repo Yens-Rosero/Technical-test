@@ -1,18 +1,22 @@
 import { User } from "./models/user";
 import { Action } from "./models/action";
-import { UserRoles } from "./../src/common/db";
-// assign number depending on hierarchy
-const roleHierarchy = {
-  [UserRoles.sysadmin]: 3,
-  [UserRoles.enterprise]: 2,
-  [UserRoles.basicuser]: 1,
+import Role from "./models/role";
+
+const roleHierarchy: Record<symbol, number> = {
+  [Role.SYS_ADMIN]: 3,
+  [Role.LOCAL_ADMIN]: 2,
+  [Role.ENTERPRISE_USER]: 1,
+  [Role.BASIC_USER]: 0,
 };
+
 const authorize = async (userId: string, actionId: string): Promise<boolean> => {
   let user: User | null;
   let action: Action | null;
+
   try {
     user = await User.getById(userId);
     action = await Action.getById(actionId);
+
     if (!user || !action) {
       return false;
     }

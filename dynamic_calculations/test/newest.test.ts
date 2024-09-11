@@ -32,6 +32,7 @@ beforeAll(async () => {
         pk: "2",
         parent: "4",
         data: { timestamp: new Date(2020, 1, 1).toISOString(), color: "red", type: "painting" },
+        role: UserRoles.basicuser,
       },
     })
     .promise();
@@ -43,6 +44,7 @@ beforeAll(async () => {
         pk: "3",
         parent: "4",
         data: { timestamp: new Date(2010, 1, 1).toISOString(), color: "blue", image: "none" },
+        role: UserRoles.basicuser,
       },
     })
     .promise();
@@ -54,13 +56,11 @@ test("Newest item returns correct data", async () => {
     body: JSON.stringify({ actionid: "4" }),
   });
 
-  // Expected date is the one with the oldest timestamp
   const expectedResult = {
     timestamp: new Date(2020, 1, 1).toISOString(),
     color: "red",
     type: "painting",
   };
 
-  // Check if the body contains the expected properties
   expect(body).toStrictEqual(expect.objectContaining({ result: expectedResult }));
 });
